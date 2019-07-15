@@ -73,7 +73,9 @@ class SampleCatalogueController {
                         let location = Location(city: biobank.city, country: biobank.country)
                         let publisher = Publisher(name: biobank.institute, location: location)
                         let samples = response.aggs.matrix[x][y]
-                        datasets.append(Dataset(id: biobank.url, name: biobank.name, theme: [theme], publisher: [publisher], samples: samples))
+                        if samples > 0 {
+                            datasets.append(Dataset(id: biobank.url, name: biobank.name, theme: [theme], publisher: [publisher], samples: samples))
+                        }
                     }
                 }
                 let catalog = Catalog(id: URL(string: "https://samples.rd-connect.eu/")!, datasets: datasets)

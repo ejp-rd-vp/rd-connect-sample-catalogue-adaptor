@@ -29,7 +29,6 @@
 		631A332F22DCD5FB0061EF9A /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631A332E22DCD5FB0061EF9A /* Location.swift */; };
 		63CAD4C122DCA12800471C5D /* Disease.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CAD4C022DCA12800471C5D /* Disease.swift */; };
 		63CAD4C722DCA2F400471C5D /* SampleCatalogueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CAD4C622DCA2F400471C5D /* SampleCatalogueController.swift */; };
-		63CAD4C922DCA37400471C5D /* DiseaseCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CAD4C822DCA37400471C5D /* DiseaseCount.swift */; };
 		OBJ_1002 /* base32.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_343 /* base32.c */; };
 		OBJ_1008 /* bcrypt.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_347 /* bcrypt.c */; };
 		OBJ_1009 /* blf.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_348 /* blf.c */; };
@@ -4067,7 +4066,6 @@
 		631A332E22DCD5FB0061EF9A /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		63CAD4C022DCA12800471C5D /* Disease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disease.swift; sourceTree = "<group>"; };
 		63CAD4C622DCA2F400471C5D /* SampleCatalogueController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleCatalogueController.swift; sourceTree = "<group>"; };
-		63CAD4C822DCA37400471C5D /* DiseaseCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiseaseCount.swift; sourceTree = "<group>"; };
 		"Console::Command::Product" /* Command.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Command.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Console::Console::Product" /* Console.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Console.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Console::Logging::Product" /* Logging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Logging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -5368,7 +5366,6 @@
 			isa = PBXGroup;
 			children = (
 				63CAD4C022DCA12800471C5D /* Disease.swift */,
-				63CAD4C822DCA37400471C5D /* DiseaseCount.swift */,
 				631A332422DCB97A0061EF9A /* Biobank.swift */,
 				631A332622DCD3B00061EF9A /* Catalog.swift */,
 				631A332822DCD3DE0061EF9A /* Dataset.swift */,
@@ -9549,7 +9546,6 @@
 				63CAD4C122DCA12800471C5D /* Disease.swift in Sources */,
 				631A332922DCD3DE0061EF9A /* Dataset.swift in Sources */,
 				631A332722DCD3B00061EF9A /* Catalog.swift in Sources */,
-				63CAD4C922DCA37400471C5D /* DiseaseCount.swift in Sources */,
 				63CAD4C722DCA2F400471C5D /* SampleCatalogueController.swift in Sources */,
 				631A332B22DCD5470061EF9A /* Theme.swift in Sources */,
 				631A332522DCB97A0061EF9A /* Biobank.swift in Sources */,
