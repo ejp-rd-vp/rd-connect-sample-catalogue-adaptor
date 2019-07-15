@@ -8,7 +8,7 @@
 import Foundation
 
 struct DiseaseCount: Codable {
-    let orpha: String
+    let orpha: URL
     let count: Int
-    let biobank: String
+    let biobank: URL
 }

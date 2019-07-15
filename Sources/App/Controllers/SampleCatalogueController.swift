@@ -32,7 +32,7 @@ class SampleCatalogueController {
         guard var components = URLComponents(string: endPoint) else {
             throw RequestError.unknown
         }
-        components.queryItems = [URLQueryItem(name: "aggs", value: "x==Disease;y==BiobankID")]
+        components.queryItems = [URLQueryItem(name: "aggs", value: "x==BiobankID;y==Disease")]
 
         switch (try? req.query.get(String.self, at: "disease"), try? req.query.get(String.self, at: "biobank")) {
         case (let disease, let biobank) where biobank == nil && disease != nil:
@@ -42,7 +42,7 @@ class SampleCatalogueController {
         case (let disease, let biobank) where biobank != nil && disease != nil:
             components.queryItems?.append(URLQueryItem(name: "q", value: "Disease==\(disease!);BiobankID==\(biobank!)"))
         default:
-            throw RequestError.missingArgument
+            break
         }
 
         guard let url = components.url else {
@@ -59,19 +59,25 @@ class SampleCatalogueController {
             }
             let decoder = JSONDecoder()
             let encoder = JSONEncoder()
-            var diseaseCount = [DiseaseCount]()
+            encoder.outputFormatting = .prettyPrinted
+            var datasets = [Dataset]()
             do {
-                let response = try decoder.decode(AggregateResponse<Aggregates<Disease, Biobank>>.self, from: data)
-                for (x, disease) in response.aggs.xLabels.enumerated() {
-                    guard let biobanks = response.aggs.yLabels else {
+                let response = try decoder.decode(AggregateResponse<Aggregates<Biobank, Disease>>.self, from: data)
+                for (x, biobank) in response.aggs.xLabels.enumerated() {
+                    guard let diseases = response.aggs.yLabels else {
                         promise.fail(error: RequestError.decodeError)
                         return
                     }
-                    for (y, biobank) in biobanks.enumerated() {
-                        diseaseCount.append(DiseaseCount(orpha: disease.IRI, count: response.aggs.matrix[x][y], biobank: biobank.name))
+                    for (y, disease) in diseases.enumerated() {
+                        let theme = Theme(id: disease.url)
+                        let location = Location(city: biobank.city, country: biobank.country)
+                        let publisher = Publisher(name: biobank.institute, location: location)
+                        let samples = response.aggs.matrix[x][y]
+                        datasets.append(Dataset(id: biobank.url, name: biobank.name, theme: [theme], publisher: [publisher], samples: samples))
                     }
                 }
-                let body = try encoder.encode(diseaseCount)
+                let catalog = Catalog(id: URL(string: "https://samples.rd-connect.eu/")!, datasets: datasets)
+                let body = try encoder.encode(catalog)
                 promise.succeed(result: req.response(body))
             } catch {
                 promise.fail(error: error)
