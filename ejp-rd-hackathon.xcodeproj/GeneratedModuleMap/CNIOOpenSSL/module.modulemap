@@ -1,0 +1,4 @@
+module CNIOOpenSSL {
+    umbrella "/Users/david/Developer/ejp-rd-hackathon/.build/checkouts/swift-nio-ssl/Sources/CNIOOpenSSL/include"
+    export *
+}
