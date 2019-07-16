@@ -32,7 +32,7 @@ class SampleCatalogueController {
         guard var components = URLComponents(string: endPoint) else {
             throw RequestError.unknown
         }
-        components.queryItems = [URLQueryItem(name: "aggs", value: "x==BiobankID;y==Disease")]
+        components.queryItems = [URLQueryItem(name: "aggs", value: "x==BiobankID;y==Disease;distinct==ParticipantID")]
 
         switch (try? req.query.get(String.self, at: "disease"), try? req.query.get(String.self, at: "biobank")) {
         case (let disease, let biobank) where biobank == nil && disease != nil:
@@ -72,13 +72,18 @@ class SampleCatalogueController {
                         let theme = Theme(id: disease.url)
                         let location = Location(city: biobank.city, country: biobank.country)
                         let publisher = Publisher(name: biobank.institute, location: location)
-                        let samples = response.aggs.matrix[x][y]
-                        if samples > 0 {
-                            datasets.append(Dataset(id: biobank.url, name: biobank.name, theme: [theme], publisher: [publisher], samples: samples))
+                        let numberOfPatients = response.aggs.matrix[x][y]
+
+                        if numberOfPatients > 0 {
+                            let dataset = Dataset(id: biobank.url, name: biobank.name, theme: [theme], publisher: publisher, numberOfPatients: numberOfPatients)
+                            datasets.append(dataset)
                         }
                     }
                 }
-                let catalog = Catalog(id: URL(string: "https://samples.rd-connect.eu/")!, datasets: datasets)
+                let id = URL(string: "https://samples.rd-connect.eu/")!
+                let location = Location(city: "Groningen", country: "The Netherlands")
+                let publisher = Publisher(name: "University Medical Center Groningen", location: location)
+                let catalog = Catalog(id: id, datasets: datasets, publisher: publisher)
                 let body = try encoder.encode(catalog)
                 promise.succeed(result: req.response(body))
             } catch {
