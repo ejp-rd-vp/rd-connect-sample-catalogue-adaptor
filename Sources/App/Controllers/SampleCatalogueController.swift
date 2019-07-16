@@ -128,20 +128,19 @@ class SampleCatalogueController {
                     return
                 }
 
-                if numberOfPatients > 0 {
-                    guard let url = URL(string: req.http.urlString, relativeTo: URL(string: "http://localhost:8080/")!) else {
-                        promise.fail(error: RequestError.invalidURL(req.http.urlString))
-                        return
-                    }
-
-                    let theme = Theme(id: disease.url)
-                    let location = Location(city: biobank.city, country: biobank.country)
-                    let publisher = Publisher(name: biobank.institute, location: location)
-
-                    let dataset = Dataset(id: url, name: biobank.name, theme: [theme], publisher: publisher, numberOfPatients: numberOfPatients)
-                    let body = try encoder.encode(dataset)
-                    promise.succeed(result: req.response(body))
+                guard let url = URL(string: req.http.urlString, relativeTo: URL(string: "http://localhost:8080/")!) else {
+                    promise.fail(error: RequestError.invalidURL(req.http.urlString))
+                    return
                 }
+
+                let theme = Theme(id: disease.url)
+                let location = Location(city: biobank.city, country: biobank.country)
+                let publisher = Publisher(name: biobank.institute, location: location)
+
+                let dataset = Dataset(id: url, name: biobank.name, theme: [theme], publisher: publisher, numberOfPatients: numberOfPatients)
+                let body = try encoder.encode(dataset)
+                promise.succeed(result: req.response(body))
+
             } catch {
                 promise.fail(error: error)
             }
