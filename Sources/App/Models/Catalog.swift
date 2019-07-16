@@ -9,17 +9,17 @@ import Foundation
 
 struct Catalog: Encodable {
     let id: URL
-    let datasets: [Dataset]
+    let datasets: [URL]
     let type = "dcat:Catalog"
     let publisher: Publisher
 
-    init(id: URL, datasets: [Dataset], publisher: Publisher) {
+    init(id: URL, datasets: [URL], publisher: Publisher) {
         self.id = id
         self.datasets = datasets
         self.publisher = publisher
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id = "@id", datasets = "dct:dataset", type, publisher
+        case id = "@id", datasets, type, publisher
     }
 }
