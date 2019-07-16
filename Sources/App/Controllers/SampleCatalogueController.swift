@@ -8,18 +8,29 @@
 import Foundation
 import Vapor
 
+extension Dataset: ResponseEncodable {
+    func encode(for req: Request) throws -> EventLoopFuture<Response> {
+        let encoder = JSONEncoder()
+        let body = try encoder.encode(self)
+        let response = req.response(body)
+        return req.future(response)
+    }
+}
+
+extension Catalog: ResponseEncodable {
+    func encode(for req: Request) throws -> EventLoopFuture<Response> {
+        let encoder = JSONEncoder()
+        let body = try encoder.encode(self)
+        let response = req.response(body)
+        return req.future(response)
+    }
+}
+
 class SampleCatalogueController {
-    private struct Aggregates<X, Y>: Decodable where X: Decodable, Y: Decodable {
-        var matrix: [[Int]]
-        var xLabels: [X]
-        var yLabels: [Y]?
-    }
+    typealias BiobankDataset = Aggregates<Biobank, Disease>
+    typealias BiobankDatasetResponse = AggregateResponse<BiobankDataset>
 
-    private struct AggregateResponse<T>: Decodable where T: Decodable {
-        var aggs: T
-    }
-
-    let endPoint = "https://samples.rd-connect.eu/api/v2/rd_connect_Sample"
+    private let endPoint = URL(string: "https://samples.rd-connect.eu/api/v2/rd_connect_Sample")!
 
     enum RequestError: Error {
         case unknown
@@ -28,8 +39,8 @@ class SampleCatalogueController {
         case missingArgument
     }
 
-    func catalog(_ req: Request) throws -> Future<Response> {
-        guard var components = URLComponents(string: endPoint) else {
+    private func makeCatalogURL(from req: Request) throws -> URL {
+        guard var components = URLComponents(url: endPoint, resolvingAgainstBaseURL: false) else {
             throw RequestError.unknown
         }
         components.queryItems = [
@@ -48,54 +59,44 @@ class SampleCatalogueController {
         guard let url = components.url else {
             throw RequestError.invalidURL(components.description)
         }
-
-        var request = URLRequest(url: url)
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        let promise = req.eventLoop.newPromise(of: Response.self)
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let data = data else {
-                promise.fail(error: error!)
-                return
-            }
-            let decoder = JSONDecoder()
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            var datasets = [URL]()
-            do {
-                let response = try decoder.decode(AggregateResponse<Aggregates<Biobank, Disease>>.self, from: data)
-                for (x, biobank) in response.aggs.xLabels.enumerated() {
-                    guard let diseases = response.aggs.yLabels else {
-                        promise.fail(error: RequestError.decodeError)
-                        return
-                    }
-                    for (y, disease) in diseases.enumerated() {
-                        let numberOfPatients = response.aggs.matrix[x][y]
-
-                        if numberOfPatients > 0 {
-                            if let url = URL(string: "http://localhost:8080/dataset/?disease=\(disease.id)&biobank=\(biobank.id)") {
-                                datasets.append(url)
-                            }
-                        }
-                    }
-                }
-                let id = URL(string: "https://samples.rd-connect.eu/")!
-                let location = Location(city: "Groningen", country: "The Netherlands")
-                let publisher = Publisher(name: "University Medical Center Groningen", location: location)
-                let catalog = Catalog(id: id, datasets: datasets, publisher: publisher)
-                let body = try encoder.encode(catalog)
-                promise.succeed(result: req.response(body))
-            } catch {
-                promise.fail(error: error)
-            }
-        }
-        task.resume()
-        return promise.futureResult
+        return url
     }
 
-    func dataset(_ req: Request) throws -> Future<Response> {
-        let disease = try req.query.get(String.self, at: "disease")
-        let biobank = try req.query.get(String.self, at: "biobank")
-        guard var components = URLComponents(string: endPoint) else {
+    func catalog(_ req: Request) throws -> Future<Catalog> {
+        let url = try makeCatalogURL(from: req)
+
+        let headers = [("Content-Type", "application/json")]
+        let client = try req.client()
+        return client.get(url, headers: HTTPHeaders(headers))
+            .flatMap { return try $0.content.decode(BiobankDatasetResponse.self) }
+            .map(to: Catalog.self) { return try self.makeCatalog($0) }
+    }
+
+    private func makeCatalog(_ response: BiobankDatasetResponse) throws -> Catalog {
+        var datasets = [URL]()
+        for (x, biobank) in response.aggs.xLabels.enumerated() {
+            for (y, disease) in response.aggs.yLabels.enumerated() {
+                let numberOfPatients = response.aggs.matrix[x][y]
+
+                if numberOfPatients > 0 {
+                    if let url = URL(string: "http://localhost:8080/dataset/?disease=\(disease.id)&biobank=\(biobank.id)") {
+                        datasets.append(url)
+                    }
+                }
+            }
+        }
+        let id = URL(string: "https://samples.rd-connect.eu/")!
+        let location = Location(city: "Groningen", country: "The Netherlands")
+        let publisher = Publisher(name: "University Medical Center Groningen", location: location)
+        let catalog = Catalog(id: id, datasets: datasets, publisher: publisher)
+        return catalog
+    }
+
+    private func makeCollectionURL(from request: Request) throws -> URL {
+        let disease = try request.query.get(String.self, at: "disease")
+        let biobank = try request.query.get(String.self, at: "biobank")
+
+        guard var components = URLComponents(url: endPoint, resolvingAgainstBaseURL: false) else {
             throw RequestError.unknown
         }
         components.queryItems = [
@@ -105,47 +106,41 @@ class SampleCatalogueController {
         guard let url = components.url else {
             throw RequestError.invalidURL(components.description)
         }
+        return url
+    }
 
-        var request = URLRequest(url: url)
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        let promise = req.eventLoop.newPromise(of: Response.self)
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let data = data else {
-                promise.fail(error: error!)
-                return
-            }
-            let decoder = JSONDecoder()
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
+    func dataset(_ req: Request) throws -> Future<Dataset> {
+        let url = try makeCollectionURL(from: req)
 
-            do {
-                let response = try decoder.decode(AggregateResponse<Aggregates<Biobank, Disease>>.self, from: data)
-                guard let biobank = response.aggs.xLabels.first,
-                    let disease = response.aggs.yLabels?.first,
-                    let numberOfPatients = response.aggs.matrix.first?.first
-                else {
-                    promise.fail(error: RequestError.decodeError)
-                    return
-                }
+        let headers = [("Content-Type", "application/json")]
+        let client = try req.client()
+        return client.get(url, headers: HTTPHeaders(headers))
+            .flatMap { return try $0.content.decode(BiobankDatasetResponse.self) }
+            .map(to: Dataset.self) { return try self.makeDataset($0.aggs) }
+    }
 
-                guard let url = URL(string: req.http.urlString, relativeTo: URL(string: "http://localhost:8080/")!) else {
-                    promise.fail(error: RequestError.invalidURL(req.http.urlString))
-                    return
-                }
-
-                let theme = Theme(id: disease.url)
-                let location = Location(city: biobank.city, country: biobank.country)
-                let publisher = Publisher(name: biobank.institute, location: location)
-
-                let dataset = Dataset(id: url, name: biobank.name, theme: [theme], publisher: publisher, numberOfPatients: numberOfPatients)
-                let body = try encoder.encode(dataset)
-                promise.succeed(result: req.response(body))
-
-            } catch {
-                promise.fail(error: error)
-            }
+    private func makeDataset(_ aggregates: BiobankDataset) throws -> Dataset {
+        guard let biobank = aggregates.xLabels.first,
+            let disease = aggregates.yLabels.first,
+            let numberOfPatients = aggregates.matrix.first?.first
+            else {
+                throw RequestError.decodeError
         }
-        task.resume()
-        return promise.futureResult
+        var components = URLComponents(string: "http://localhost:8080/")
+        components?.queryItems = [
+            URLQueryItem(name: "disease", value: disease.url.absoluteString),
+            URLQueryItem(name: "biobank", value: biobank.id)
+        ]
+        guard let url = components?.url else {
+            throw RequestError.invalidURL(components?.description ?? "Invalid URL components")
+        }
+
+        let theme = Theme(id: disease.url)
+        let location = Location(city: biobank.city, country: biobank.country)
+        let publisher = Publisher(name: biobank.institute, location: location)
+
+        let dataset = Dataset(id: url, name: biobank.name, theme: [theme], publisher: publisher, numberOfPatients: numberOfPatients)
+        return dataset
+
     }
 }

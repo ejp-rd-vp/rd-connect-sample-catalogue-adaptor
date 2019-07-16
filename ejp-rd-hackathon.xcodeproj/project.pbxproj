@@ -27,6 +27,8 @@
 		631A332B22DCD5470061EF9A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631A332A22DCD5470061EF9A /* Theme.swift */; };
 		631A332D22DCD5A10061EF9A /* Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631A332C22DCD5A10061EF9A /* Publisher.swift */; };
 		631A332F22DCD5FB0061EF9A /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631A332E22DCD5FB0061EF9A /* Location.swift */; };
+		631A333322DE01BD0061EF9A /* Aggregates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631A333222DE01BD0061EF9A /* Aggregates.swift */; };
+		631A333522DE01E90061EF9A /* AggregateResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631A333422DE01E90061EF9A /* AggregateResponse.swift */; };
 		63CAD4C122DCA12800471C5D /* Disease.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CAD4C022DCA12800471C5D /* Disease.swift */; };
 		63CAD4C722DCA2F400471C5D /* SampleCatalogueController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CAD4C622DCA2F400471C5D /* SampleCatalogueController.swift */; };
 		OBJ_1002 /* base32.c in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_343 /* base32.c */; };
@@ -4064,6 +4066,8 @@
 		631A332A22DCD5470061EF9A /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		631A332C22DCD5A10061EF9A /* Publisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publisher.swift; sourceTree = "<group>"; };
 		631A332E22DCD5FB0061EF9A /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		631A333222DE01BD0061EF9A /* Aggregates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aggregates.swift; sourceTree = "<group>"; };
+		631A333422DE01E90061EF9A /* AggregateResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggregateResponse.swift; sourceTree = "<group>"; };
 		63CAD4C022DCA12800471C5D /* Disease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disease.swift; sourceTree = "<group>"; };
 		63CAD4C622DCA2F400471C5D /* SampleCatalogueController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleCatalogueController.swift; sourceTree = "<group>"; };
 		"Console::Command::Product" /* Command.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Command.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -5372,6 +5376,8 @@
 				631A332A22DCD5470061EF9A /* Theme.swift */,
 				631A332C22DCD5A10061EF9A /* Publisher.swift */,
 				631A332E22DCD5FB0061EF9A /* Location.swift */,
+				631A333222DE01BD0061EF9A /* Aggregates.swift */,
+				631A333422DE01E90061EF9A /* AggregateResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -9542,6 +9548,8 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_728 /* boot.swift in Sources */,
+				631A333322DE01BD0061EF9A /* Aggregates.swift in Sources */,
+				631A333522DE01E90061EF9A /* AggregateResponse.swift in Sources */,
 				OBJ_729 /* configure.swift in Sources */,
 				63CAD4C122DCA12800471C5D /* Disease.swift in Sources */,
 				631A332922DCD3DE0061EF9A /* Dataset.swift in Sources */,
