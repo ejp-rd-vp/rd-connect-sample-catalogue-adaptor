@@ -10,7 +10,7 @@ import Foundation
 struct Catalog: Encodable {
     let id: URL
     let datasets: [URL]
-    let type = "dcat:Catalog"
+    let type = "CatalogOfRegistries"
     let publisher: Publisher
 
     init(id: URL, datasets: [URL], publisher: Publisher) {
