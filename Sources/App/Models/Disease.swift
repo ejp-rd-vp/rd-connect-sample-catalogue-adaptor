@@ -7,9 +7,7 @@
 
 import Foundation
 
-import Foundation
-
-struct Disease: Decodable {
+struct Disease: Codable {
     static var name = "Disease"
 
     var IRI: String

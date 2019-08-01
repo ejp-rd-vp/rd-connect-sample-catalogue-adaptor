@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BiobankDiseaseCounts: Decodable {
+struct BiobankDiseaseCounts: Codable {
     var counts: [[Int]]
     var biobanks: [Biobank]
     var diseases: [Disease]

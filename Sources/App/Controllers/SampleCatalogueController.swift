@@ -11,65 +11,52 @@ import Vapor
 class SampleCatalogueController {
 
     func catalog(_ req: Request) throws -> Future<Catalog> {
-        let url = try makeCatalogURL(from: req)
+        var components = catalogEndPoint
+        if let filter = req.filter?.queryItem {
+            components.queryItems?.append(filter)
+        }
+        guard let url = components.url else { throw RequestError.invalidURL(components.debugDescription)}
 
         let headers = [("Content-Type", "application/json")]
         let client = try req.client()
         return client.get(url, headers: HTTPHeaders(headers))
             .flatMap { return try $0.content.decode(BiobankDatasetResponse.self) }
-            .map(to: Catalog.self) { return try Catalog(from: $0) }
+            .map(to: Catalog.self) { return try Catalog(from: $0, for: self.localURL) }
     }
 
     func dataset(_ req: Request) throws -> Future<Dataset> {
-        let url = try makeCollectionURL(from: req)
+        guard let filter = req.filter?.queryItem else { throw RequestError.missingParameters}
+        var components = collectionEndPoint
+        components.queryItems?.append(filter)
+        guard let url = components.url else { throw RequestError.invalidURL(components.debugDescription)}
 
         let headers = [("Content-Type", "application/json")]
         let client = try req.client()
         return client.get(url, headers: HTTPHeaders(headers))
             .flatMap { return try $0.content.decode(BiobankDatasetResponse.self) }
-            .map(to: Dataset.self) { return try Dataset(from: $0.data) }
+            .map(to: Dataset.self) { return try Dataset(from: $0.data, for: self.localURL) }
+    }
+
+    init(catalog url: URL, localURL: URL) {
+        self.catalogBaseURL = url
+        self.localURL = localURL
     }
 
     private enum RequestError: Error {
-        case unknown
         case invalidURL(_ string: String)
+        case missingParameters
     }
 
-    private let endPoint = URL(string: "https://samples.rd-connect.eu/api/v2/rd_connect_Sample")!
+    private var catalogBaseURL: URL
+    private var localURL: URL
 
-    func makeCatalogURL(from request: Request) throws -> URL {
-        var components = URLComponents(url: endPoint, resolvingAgainstBaseURL: false)!
-
-        components.queryItems = [
-            URLQueryItem(name: "aggs", value: "x==BiobankID;y==Disease"),
-        ]
-        let disease = try? request.query.get(String.self, at: "disease")
-        let biobank = try? request.query.get(String.self, at: "biobank")
-        if let biobank = biobank, let disease = disease {
-            components.queryItems?.append(URLQueryItem(name: "q", value: "Disease==\(disease);BiobankID==\(biobank)"))
-        } else if let disease = disease {
-            components.queryItems?.append(URLQueryItem(name: "q", value: "Disease==\(disease)"))
-        } else if let biobank = biobank {
-            components.queryItems?.append(URLQueryItem(name: "q", value: "BiobankID==\(biobank)"))
-        }
-        guard let url = components.url else {
-            throw RequestError.invalidURL(components.description)
-        }
-        return url
+    private var collectionEndPoint: URLComponents {
+        let endPoint = URL(string: "/api/v2/rd_connect_Sample?aggs=x==BiobankID;y==Disease;distinct==ParticipantID", relativeTo: catalogBaseURL)!
+        return URLComponents(url: endPoint, resolvingAgainstBaseURL: true)!
     }
 
-    func makeCollectionURL(from request: Request) throws -> URL {
-        var components = URLComponents(url: endPoint, resolvingAgainstBaseURL: false)!
-        let disease = try request.query.get(String.self, at: "disease")
-        let biobank = try request.query.get(String.self, at: "biobank")
-
-        components.queryItems = [
-            URLQueryItem(name: "aggs", value: "x==BiobankID;y==Disease;distinct==ParticipantID"),
-            URLQueryItem(name: "q", value: "Disease==\(disease);BiobankID==\(biobank)")
-        ]
-        guard let url = components.url else {
-            throw RequestError.invalidURL(components.description)
-        }
-        return url
+    private var catalogEndPoint: URLComponents {
+        let endPoint = URL(string: "/api/v2/rd_connect_Sample?aggs=x==BiobankID;y==Disease", relativeTo: catalogBaseURL)!
+        return URLComponents(url: endPoint, resolvingAgainstBaseURL: true)!
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Theme: Encodable {
+struct Theme: Codable {
     let id: URL
 
     private enum CodingKeys: String, CodingKey {

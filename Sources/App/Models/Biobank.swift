@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Biobank: Decodable {
+struct Biobank: Codable {
     let id: String
     let country: String
     let institute: String

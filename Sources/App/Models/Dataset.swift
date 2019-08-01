@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Dataset: Encodable {
+struct Dataset: Codable {
     let id: URL
     let type = "BiobankDataset"
     let name: String

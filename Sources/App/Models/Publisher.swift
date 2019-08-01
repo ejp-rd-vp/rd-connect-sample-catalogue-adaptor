@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Publisher: Encodable {
+struct Publisher: Codable {
     let name: String
     let location: Location
 

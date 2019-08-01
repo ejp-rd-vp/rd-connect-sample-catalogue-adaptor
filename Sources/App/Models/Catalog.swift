@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Catalog: Encodable {
+struct Catalog: Codable {
     let id: URL
     let datasets: [URL]
     let type = "CatalogOfRegistries"

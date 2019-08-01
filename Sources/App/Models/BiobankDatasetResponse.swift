@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BiobankDatasetResponse: Decodable {
+struct BiobankDatasetResponse: Codable {
     var data: BiobankDiseaseCounts
 
     private enum CodingKeys: String, CodingKey {
