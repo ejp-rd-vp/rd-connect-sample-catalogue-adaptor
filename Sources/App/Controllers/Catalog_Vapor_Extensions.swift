@@ -20,7 +20,7 @@ extension Catalog: Content {
                     var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
                     components?.path = "/dataset/"
                     components?.queryItems = [
-                        URLQueryItem(name: "disease", value: disease.id),
+                        URLQueryItem(name: "disease", value: disease.compactID),
                         URLQueryItem(name: "biobank", value: biobank.id)
                     ]
                     if let url = components?.url {

@@ -25,17 +25,21 @@ extension Dataset: Content {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         components?.path = "/dataset/"
         components?.queryItems = [
-            URLQueryItem(name: "disease", value: disease.url.absoluteString),
+            URLQueryItem(name: "disease", value: disease.compactID),
             URLQueryItem(name: "biobank", value: biobank.id)
         ]
         guard let url = components?.url else {
             throw RequestError.invalidURL(components?.description ?? "Invalid URL components")
         }
 
-        let theme = Theme(id: disease.url)
+        var themes = [Theme]()
+        if let theme = disease.url {
+            let theme = Theme(id: theme)
+            themes.append(theme)
+        }
         let location = Location(city: biobank.city, country: biobank.country)
         let publisher = Publisher(name: biobank.institute, location: location)
 
-        self.init(id: url, name: biobank.name, theme: [theme], publisher: publisher, numberOfPatients: numberOfPatients)
+        self.init(id: url, name: biobank.name, theme: themes, publisher: publisher, numberOfPatients: numberOfPatients)
     }
 }
