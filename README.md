@@ -1,4 +1,4 @@
-# Vapor Clean
+# RD-Connect Sample Catalogue Adaptor
 
 This is a template for Vapor 3 users that does the absolute minimum to set up a working Vapor 3 environment.
 
@@ -8,8 +8,7 @@ Although this repository contains a LICENSE file, this is meant for you to repla
 
 It’s my hope that the official Vapor project will add a template similar to this one at some point in the future, but until then please use this however you want.
 
-## Try it out
+## Running in Docker
 
-If you have already installed the Vapor toolbox, you can create a new Vapor project from this repo using the following command:
-
-    vapor new MyProject --template=twostraws/vapor-clean
+    docker build -t rd-connect-sample-catalogue-adaptor
+    docker run --name RD-Connect -e "ENVIRONMENT=production"  -p 8080:80 rd-connect-sample-catalogue-adaptor
