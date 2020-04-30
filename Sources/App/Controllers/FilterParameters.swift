@@ -1,10 +1,3 @@
-//
-//  Filter.swift
-//  App
-//
-//  Created by David van Enckevort on 22/07/2019.
-//
-
 import Foundation
 import Vapor
 
