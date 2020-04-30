@@ -38,6 +38,15 @@
         }
       },
       {
+        "package": "EJPRDMetadata",
+        "repositoryURL": "https://github.com/ejp-rd-vp/ejp-rd-metadata-swift.git",
+        "state": {
+          "branch": null,
+          "revision": "c5b381ce92aa98c5aa6bb11b420932e659aa6ba3",
+          "version": "0.1.2"
+        }
+      },
+      {
         "package": "HTTP",
         "repositoryURL": "https://github.com/vapor/http.git",
         "state": {
