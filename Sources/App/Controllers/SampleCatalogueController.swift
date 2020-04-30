@@ -1,10 +1,3 @@
-//
-//  SampleCatalogueController.swift
-//  App
-//
-//  Created by David van Enckevort on 15/07/2019.
-//
-
 import Foundation
 import Vapor
 import EJPRDMetadata
